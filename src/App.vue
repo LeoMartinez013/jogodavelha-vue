@@ -1,40 +1,36 @@
 <template>
-  <header>
-    <Topo/>
-  </header>
-  <main>
-    <Jogo/>
-  </main>
-  <footer>
-    <Rodape/>
-  </footer>
+  <Header/>
+  <Main/>
+  <Footer/>
 </template>
 <script>
-import Jogo from './components/Jogo.vue'
-import Rodape from './components/Rodape.vue'
-import Topo from './components/Topo.vue'
+import Main from './components/Main.vue'
+import Footer from './components/Footer.vue'
+import Header from './components/Header.vue'
 export default {
   name: 'App',
   components: {
-    Topo,
-    Rodape,
-    Jogo
+    Header,
+    Footer,
+    Main
   }
 }
+</script>
 
-    Topo</script>
 <style>
   body {
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  text-align: center;
-  color: #2c3e50;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    text-align: center;
+    color: #2c3e50;
 
-  background-image: linear-gradient(to bottom, #e2a431, #68320e);
+    background-image: linear-gradient(to bottom, #60ff82, #035e17);
 
-  
-  padding: 0px;
-  margin: 0px;
+    min-height: 100vh;
 
-
-}
+    width: 100%;
+    padding: 0px;
+    margin: 0px;
+    display: flex;
+    flex-direction: column;
+  }
 </style>

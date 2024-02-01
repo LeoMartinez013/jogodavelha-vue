@@ -1,17 +1,15 @@
 <template>
-    <div id="footer">
-        <p>Site de Leonardo Martinez</p>
-    </div>
+<footer>
+    <p>Site de Leonardo Martinez</p>
+</footer>
 </template>
 <script>
 export default {
-    name: 'Rodape',
+    name: 'Footer',
 }
 </script>
 <style scoped>
-#footer {
-    background-color: #babaee;
-
+footer {
     height: 10vh;
     margin: 0px;
 }
