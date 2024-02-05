@@ -16,14 +16,13 @@ export default {
   }
 }
 </script>
-
 <style>
   body {
     font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     text-align: center;
     color: #2c3e50;
 
-    background-image: linear-gradient(to bottom, #60ff82, #035e17);
+    background-image: linear-gradient(to bottom, #98ffaf, #076d1d);
 
     min-height: 100vh;
 

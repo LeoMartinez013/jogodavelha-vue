@@ -38,13 +38,13 @@
     </div>
 </div>
 <div id="resultado">
-    <p>{{ mensagem }}</p>
-    <button v-if="resetar" @click="reiniciar()">Reiniciar</button>
+    <p id="mensagem">{{ mensagem }}</p>
+    <p id="reiniciar" v-if="resetar" @click="reiniciar()">Reiniciar</p>
 </div>
 <div id="contadores">
     <p id="p-vitorias">Vitórias: <span id="cont-vitoria">{{ vitorias }}</span></p>
-    <p id="p-empate">Empate: <span id="cont-empate">{{ empates }}</span></p>
-    <p id="p-derrota">Derrota: <span id="cont-derrota">{{ derrotas }}</span></p>
+    <p id="p-empate">Empates: <span id="cont-empate">{{ empates }}</span></p>
+    <p id="p-derrota">Derrotas: <span id="cont-derrota">{{ derrotas }}</span></p>
 </div>
 </template>
 <script>
@@ -582,7 +582,7 @@ export default {
     display: grid;
     grid-template-columns: 1fr 1fr 1fr;
     grid-template-rows: 1fr 1fr 1fr;
-    gap: 0.05rem;
+    gap: auto;
     background-color: #000000;
 
     height: min-content;
@@ -592,16 +592,20 @@ export default {
     max-width: 500px;
 
     border: 0.1rem solid #000000;
+    border-radius: 10px;
     margin: 0 auto;
 }
-#contadores {
-    width: 100%;
-    background-color: transparent;
-    backdrop-filter: blur(100px);
+.a1 {
+    border-top-left-radius: 10px;
 }
-#contadores > p {
-    font-size: 1.1rem;
-    margin: 0;
+.a3 {
+    border-top-right-radius: 10px;
+}
+.c1 {
+    border-bottom-left-radius: 10px;
+}
+.c3 {
+    border-bottom-right-radius: 10px;
 }
 .campo {
     display: flex;
@@ -614,7 +618,6 @@ export default {
     border: 0.1px #000 solid;
     margin: 0px;
 }
-
 .campo:hover {
     cursor: pointer;
     color: #dde0f7;
@@ -625,16 +628,51 @@ export default {
     height: 70%;
     width: auto;
 }
-#resultado > p {
-    font-size: 20px;
-    text-align: center;
+#resultado {
+    display: flex;
+    justify-content: space-evenly;
+    align-items: center;
+    background-color: #ebeeff;
+    width: calc(7rem + 7rem + 7rem + 4px);
+    max-width: 500px;
+    height: 2rem;
+    margin: 0.5rem auto;
+    border-radius: 5px;
+}
+#mensagem {
+    font-size: 1.2rem;
     color: #000;
-    background-color: #b6b5b5;
+    margin: 0;
+}
+#reiniciar {
+    font-size: 1.2rem;
+    color: #000;
+    margin: 0;  
+}
+#reiniciar:hover {
+    text-decoration: underline;
+    cursor: pointer;
+}
+#contadores {
+    display: flex;
+    align-items: center;
+    justify-content: space-evenly;
 
-    height: 30px;
-    width: 50%;
+    text-align: center;
+    font-weight: 400;
+    color: black;
 
-    margin: 10px 25% 0 25%;
+    width: 20.3rem;
+    height: auto;
+    padding: 0.2rem 0.5rem;
+    border-radius: 5px;
+    margin: 0 auto;
+
+    background-color: #ebeeff;
+}
+#contadores > p {
+    font-size: 1rem;
+    margin: 0;
 }
 @media screen and (max-width: 400px) {
     .campo {

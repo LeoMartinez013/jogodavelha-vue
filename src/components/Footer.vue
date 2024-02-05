@@ -1,6 +1,6 @@
 <template>
 <footer>
-    <p>Site de Leonardo Martinez</p>
+    <p>Leonardo Martinez</p>
 </footer>
 </template>
 <script>
@@ -15,6 +15,7 @@ footer {
 }
 p {
     text-align: center;
+    color: #e0e0e0;
     height: 40%;
     padding: 30%, 30%, 30%, 30%;
 }

@@ -1,6 +1,6 @@
 <template>
     <header>
-        <h1>Jogo da velha em Vuejs</h1>
+        <h1>Jogo da velha com Vuejs</h1>
     </header>
 </template>
 <script>
