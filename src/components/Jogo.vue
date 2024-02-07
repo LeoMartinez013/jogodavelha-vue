@@ -48,6 +48,8 @@
 </div>
 </template>
 <script>
+import { defesa, ataque } from './bot/bot.js';
+
 export default {
     name: "Jogo",
     data() {
@@ -55,7 +57,7 @@ export default {
             resetar: false,
             mensagem: "Você é o X",
             status: "null",
-            mode: "easy",
+            mode: "hard",
             jogadas: 0,
             vitorias: 0,
             empates: 0,
@@ -108,6 +110,7 @@ export default {
                 console.log(this.campos[chave].id);
             }
         }
+        console.clear()
     },
     methods: {
         mainGame(id) {
@@ -119,7 +122,6 @@ export default {
             if (verif) {
                 this.checkX()
                 this.jogadas++
-                console.log('Check Empate: ' + this.resetar + ' ' + this.jogadas + ' ' + this.status)
                 if (this.jogadas == 9 && this.status == 'null') {
                     this.draw()
                     console.log('Jogada: ' + this.jogadas)
@@ -196,7 +198,6 @@ export default {
             return false
         },
         checkO() {
-            console.log("verif check0: " + this.resetar)
             if (this.campos.a1.value == 2) {
                 if (this.campos.a2.value == 2 && this.campos.a3.value == 2) {
                 //| O O O
@@ -275,7 +276,6 @@ export default {
             }
         },
         checkX() {
-            console.log("verif checkX: " + this.resetar)
             if (this.campos.a1.value == 1) {
                 if (this.campos.a2.value == 1 && this.campos.a3.value == 1) {
                 //| X X X
@@ -457,53 +457,73 @@ export default {
             } while (repetido)
         },
         robo() {
+            
             if (this.jogadas == 0) {
                 this.randomBot()
                 return
             }
+            let move = 0
             if(this.mode == 'easy'){
                 //  Easy Mode
                 this.randomBot()
                 return
             } else if (this.mode == 'medium') {
                 //  Medium Mode
-                if (this.campos.a1.value == 1 ) {
-                    if (this.campos.a2.value == 1 && this.campos.a3.value == 0) {
-                    //| X X O
-                    //|
-                    //|
-                        this.botA3()
-                        return
+                move = defesa(this.campos)
+                console.log('Check medium ' + move)
+            } else if (this.mode == 'hard') {
+                move = ataque(this.campos)
+                console.log('Check hard ' + move)
+            }
+            switch (move) {
+                case 1:
+                    if(this.campos.a1.value == 0) {
+                        this.botA1()
                     }
-                    if (this.campos.a3.value == 1 && this.campos.a2.value == 0) {
-                    //| X O X
-                    //|
-                    //|
+                    break;
+                case 2:
+                    if(this.campos.a2.value == 0) {
                         this.botA2()
-                        return
                     }
-                    if (this.campos.b1.value == 1 && this.campos.c1.value == 0) {
-                    //| X
-                    //| X
-                    //| O
-                        this.botC1()
-                        return
+                    break;
+                case 3:
+                    if(this.campos.a3.value == 0) {
+                        this.botA3()
                     }
-                    if (this.campos.c1.value == 1 && this.campos.b1.value == 0) {
-                    //| X
-                    //| O
-                    //| X
+                    break;
+                case 4:
+                    if(this.campos.b1.value == 0) {
                         this.botB1()
-                        return
                     }
-                    if (this.campos.b2.value == 1 && this.campos.c3.value == 0) {
-                    //| X
-                    //|   X
-                    //|     O
+                    break;
+                case 5:
+                    if(this.campos.b2.value == 0) {
+                        this.botB2()
+                    }
+                    break;
+                case 6:
+                    if(this.campos.b3.value == 0) {
+                        this.botB3()
+                    }
+                    break;
+                case 7:
+                    if(this.campos.c1.value == 0) {
+                        this.botC1()
+                    }
+                    break;
+                case 8:
+                    if(this.campos.c2.value == 0) {
+                        this.botC2()
+                    }
+                    break;
+                case 9:
+                    if(this.campos.c3.value == 0) {
                         this.botC3()
-                        return
                     }
-                }
+                    break;
+                default:
+                    this.randomBot()
+                    break;
             }
         },
         botA1() {
@@ -550,8 +570,7 @@ export default {
             this.campos.c3.value = 2
             this.jogadas++
             console.log('Bot: C3')
-        },
-        
+        },       
         reiniciar() {
             this.campos.a1.value = 0
             this.campos.a2.value = 0
@@ -569,6 +588,7 @@ export default {
             document.querySelectorAll('.a1, .a2, .a3, .b1, .b2, .b3, .c1, .c2, .c3').forEach(elemento => {
                 elemento.style.backgroundColor = '#ebeeff';
             })
+            console.clear()
         },
     },
 };
