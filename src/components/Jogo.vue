@@ -1,5 +1,5 @@
 <template>
-<div id="jogo">
+<section id="jogo">
     <div @click="mainGame(campos.a1.id)" class="campo a1">
         <img v-if="campos.a1.value == 1" id="a1-X" src="../assets/x.png" alt="" class="img-campos">
         <img v-if="campos.a1.value == 2" id="a1-O" src="../assets/o.png" alt="" class="img-campos">
@@ -36,16 +36,33 @@
         <img v-if="campos.c3.value == 1" id="c3-X" src="../assets/x.png" alt="" class="img-campos">
         <img v-if="campos.c3.value == 2" id="c3-O" src="../assets/o.png" alt="" class="img-campos">
     </div>
-</div>
-<div id="resultado">
-    <p id="mensagem">{{ mensagem }}</p>
-    <p id="reiniciar" v-if="resetar" @click="reiniciar()">Reiniciar</p>
-</div>
-<div id="contadores">
-    <p id="p-vitorias">Vitórias: <span id="cont-vitoria">{{ vitorias }}</span></p>
-    <p id="p-empate">Empates: <span id="cont-empate">{{ empates }}</span></p>
-    <p id="p-derrota">Derrotas: <span id="cont-derrota">{{ derrotas }}</span></p>
-</div>
+</section>
+
+<section id="infos">
+    <div id="resultado">
+        <p id="mensagem">{{ mensagem }}</p>
+        <p id="reiniciar" v-if="resetar" @click="reiniciar()">Reiniciar</p>
+    </div>
+    <div id="dificuldades">
+        <p>
+            <input type="checkbox" id="easyMode" @click="dificult('easy')">
+            <label value="easy">fácil</label>
+        </p>
+        <p>
+            <input type="checkbox" id="mediumMode" @click="dificult('medium')">
+            <label value="medium">Médio</label>
+        </p>
+        <p>
+            <input type="checkbox" id="hardMode" @click="dificult('hard')">
+            <label value="hard">Difícil</label>
+        </p>
+    </div>
+    <div id="contadores">
+        <p id="p-vitorias">Vitórias: <span id="cont-vitoria">{{ vitorias }}</span></p>
+        <p id="p-empate">Empates: <span id="cont-empate">{{ empates }}</span></p>
+        <p id="p-derrota">Derrotas: <span id="cont-derrota">{{ derrotas }}</span></p>
+    </div>
+</section>
 </template>
 <script>
 import { defesa, ataque } from './bot/bot.js';
@@ -57,7 +74,7 @@ export default {
             resetar: false,
             mensagem: "Você é o X",
             status: "null",
-            mode: "hard",
+            mode: "easy",
             jogadas: 0,
             vitorias: 0,
             empates: 0,
@@ -103,8 +120,8 @@ export default {
             
         };
     },
-    
     mounted() {
+        document.querySelector('#easyMode').checked = true
         for (let chave in this.campos) {
             if (this.campos.hasOwnProperty(chave)) {
                 console.log(this.campos[chave].id);
@@ -113,6 +130,36 @@ export default {
         console.clear()
     },
     methods: {
+        dificult(auxMode) {
+            const checkEasy = document.querySelector('#easyMode')
+            const checkMedium = document.querySelector('#mediumMode')
+            const checkHard = document.querySelector('#hardMode')
+            if (!checkEasy.checked && !checkMedium.checked && !checkHard.checked) {
+                if (auxMode == 'easy') {
+                    checkEasy.checked = true
+                } else if (auxMode == 'medium') {
+                    checkMedium.checked = true
+                } else if (auxMode == 'hard') {
+                    checkHard.checked = true
+                }
+                return
+            } else if (auxMode == 'easy') {
+                console.log('Dificuldade: Easy')
+                checkMedium.checked = false
+                checkHard.checked = false
+                this.mode = 'easy'
+            } else if (auxMode == 'medium') {
+                console.log('Dificuldade: Medium')
+                checkEasy.checked = false
+                checkHard.checked = false
+                this.mode = 'medium'
+            } else if (auxMode == 'hard') {
+                console.log('Dificuldade: Hard')
+                checkEasy.checked = false
+                checkMedium.checked = false
+                this.mode = 'hard'
+            }
+        },
         mainGame(id) {
             //  Impede que o usuário interaja novamente após o final da partida      
             if (this.resetar) {
@@ -648,16 +695,29 @@ export default {
     height: 70%;
     width: auto;
 }
+#infos {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: auto auto;
+    grid-template-areas: 
+        "resultado resultado"
+        "dificuldades contadores";
+    gap: 5%;
+    max-width: 500px;
+    width: 80%;
+
+    margin: 10px auto 0 auto;
+}
+#infos > div {
+    background-color: #ebeeff;
+    border-radius: 5px;
+}
+
 #resultado {
+    grid-area: resultado;
     display: flex;
     justify-content: space-evenly;
     align-items: center;
-    background-color: #ebeeff;
-    width: calc(7rem + 7rem + 7rem + 4px);
-    max-width: 500px;
-    height: 2rem;
-    margin: 0.5rem auto;
-    border-radius: 5px;
 }
 #mensagem {
     font-size: 1.2rem;
@@ -673,24 +733,28 @@ export default {
     text-decoration: underline;
     cursor: pointer;
 }
+#dificuldades {
+    grid-area: dificuldades;
+    text-align: center;
+    font-weight: 400;
+    color: black;
+    padding: 0.2rem 0.5rem;
+}
+#dificuldades > p {
+    margin: 0;
+}
 #contadores {
+    grid-area: contadores;
     display: flex;
-    align-items: center;
-    justify-content: space-evenly;
+    flex-direction: column;
 
     text-align: center;
     font-weight: 400;
     color: black;
 
-    width: 20.3rem;
-    height: auto;
     padding: 0.2rem 0.5rem;
-    border-radius: 5px;
-    margin: 0 auto;
-
-    background-color: #ebeeff;
 }
-#contadores > p {
+#contadores > p { 
     font-size: 1rem;
     margin: 0;
 }

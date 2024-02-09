@@ -10,13 +10,17 @@ export default {
 </script>
 <style scoped>
 footer {
-    height: 10vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 9vh;
     margin: 0px;
 }
 p {
+    font-size: 1rem;
     text-align: center;
     color: #e0e0e0;
-    height: 40%;
     padding: 30%, 30%, 30%, 30%;
+    margin: 0;
 }
 </style>
