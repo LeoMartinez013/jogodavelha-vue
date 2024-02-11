@@ -1,4 +1,5 @@
 <template>
+<Painel @salvar="salvarDados"/>
 <section id="jogo">
     <div @click="mainGame(campos.a1.id)" class="campo a1">
         <img v-if="campos.a1.value == 1" id="a1-X" src="../assets/x.png" alt="" class="img-campos">
@@ -37,48 +38,61 @@
         <img v-if="campos.c3.value == 2" id="c3-O" src="../assets/o.png" alt="" class="img-campos">
     </div>
 </section>
-
-<section id="infos">
+<section id="section-2">
     <div id="resultado">
         <p id="mensagem">{{ mensagem }}</p>
-        <p id="reiniciar" v-if="resetar" @click="reiniciar()">Reiniciar</p>
+        <p id="reiniciar" v-if="reset" @click="reiniciar()">Reiniciar</p>
     </div>
-    <div id="dificuldades">
+    <div id="infos">
         <p>
-            <input type="checkbox" id="easyMode" @click="dificult('easy')">
-            <label value="easy">fácil</label>
+            modo:
+            <span v-if="mode == 'bot'">Contra bot</span>
+            <span v-if="mode == 'versus'">Versus</span>
         </p>
         <p>
-            <input type="checkbox" id="mediumMode" @click="dificult('medium')">
-            <label value="medium">Médio</label>
-        </p>
-        <p>
-            <input type="checkbox" id="hardMode" @click="dificult('hard')">
-            <label value="hard">Difícil</label>
+            dificuldade:
+            <span v-if="difficulty == 'easy'">Fácil</span>
+            <span v-if="difficulty == 'medium'">Médio</span>
+            <span v-if="difficulty == 'hard'">Difícil</span>
+
         </p>
     </div>
     <div id="contadores">
-        <p id="p-vitorias">Vitórias: <span id="cont-vitoria">{{ vitorias }}</span></p>
-        <p id="p-empate">Empates: <span id="cont-empate">{{ empates }}</span></p>
-        <p id="p-derrota">Derrotas: <span id="cont-derrota">{{ derrotas }}</span></p>
+        <p id="p-vitoria-X">
+            <span v-if="mode == 'bot'">Vitórias: </span>
+            <span v-if="mode == 'versus'">Vitórias do X: </span>
+            <span id="cont-vitoriasX">{{ vitoriasX }}</span>
+        </p>
+        <p id="p-empate">
+            Empates: <span id="cont-empate">{{ empates }}</span></p>
+        <p id="p-vitoria-O">
+            <span v-if="mode == 'bot'">Derrotas: </span>
+            <span v-if="mode == 'versus'">Vitórias do O: </span>
+            <span id="cont-vitoriasO">{{ vitoriasO }}</span>
+        </p>
     </div>
 </section>
 </template>
 <script>
-import { defesa, ataque } from './bot/bot.js';
-
+import { defesa, ataque } from './bot/bot.js'
+import Painel from '../components/Painel.vue'
 export default {
     name: "Jogo",
+    components: {
+        Painel
+    },
     data() {
         return {
-            resetar: false,
+            reset: false,
+            mode: "bot",
+            vezJogar: 0,
             mensagem: "Você é o X",
             status: "null",
-            mode: "easy",
+            difficulty: "easy",
             jogadas: 0,
-            vitorias: 0,
+            vitoriasX: 0,
             empates: 0,
-            derrotas: 0,
+            vitoriasO: 0,
             campos: {
                 a1: {
                     id: 1,
@@ -117,55 +131,48 @@ export default {
                     value: 0,
                 },
             }
-            
-        };
+        }
     },
     mounted() {
-        document.querySelector('#easyMode').checked = true
-        for (let chave in this.campos) {
+        /*for (let chave in this.campos) {
             if (this.campos.hasOwnProperty(chave)) {
                 console.log(this.campos[chave].id);
             }
-        }
-        console.clear()
+        }*/
     },
     methods: {
-        dificult(auxMode) {
-            const checkEasy = document.querySelector('#easyMode')
-            const checkMedium = document.querySelector('#mediumMode')
-            const checkHard = document.querySelector('#hardMode')
-            if (!checkEasy.checked && !checkMedium.checked && !checkHard.checked) {
-                if (auxMode == 'easy') {
-                    checkEasy.checked = true
-                } else if (auxMode == 'medium') {
-                    checkMedium.checked = true
-                } else if (auxMode == 'hard') {
-                    checkHard.checked = true
+        salvarDados(pass) {
+            if (pass.alter) {
+                this.reiniciar()
+                this.mode = pass.mode
+                this.difficulty = pass.difficulty
+                this.vitoriasX = 0
+                this.empates = 0
+                this.vitoriasO = 0
+
+                if (this.mode == 'versus') {
+                    this.vezJogar = this.randomVezJogar()
+                    if (this.vezJogar == 1) {
+                        this.mensagem = 'Vez do X'
+                    } else {
+                        this.mensagem = 'Vez do O'
+                    }
                 }
-                return
-            } else if (auxMode == 'easy') {
-                console.log('Dificuldade: Easy')
-                checkMedium.checked = false
-                checkHard.checked = false
-                this.mode = 'easy'
-            } else if (auxMode == 'medium') {
-                console.log('Dificuldade: Medium')
-                checkEasy.checked = false
-                checkHard.checked = false
-                this.mode = 'medium'
-            } else if (auxMode == 'hard') {
-                console.log('Dificuldade: Hard')
-                checkEasy.checked = false
-                checkMedium.checked = false
-                this.mode = 'hard'
             }
         },
         mainGame(id) {
             //  Impede que o usuário interaja novamente após o final da partida      
-            if (this.resetar) {
+            if (this.reset) {
                 return
             }
-            let verif = this.click(id)
+            if (this.mode == 'bot') {
+                this.modeBot(id)
+            } else {
+                this.modeVersus(id)
+            }
+        },
+        modeBot(id) {
+            let verif = this.clickX(id)
             if (verif) {
                 this.checkX()
                 this.jogadas++
@@ -173,7 +180,7 @@ export default {
                     this.draw()
                     console.log('Jogada: ' + this.jogadas)
                     return
-                } else if (!this.resetar) {
+                } else if (!this.reset) {
                     this.robo()
                     this.checkO()
                 }
@@ -181,7 +188,36 @@ export default {
                 console.log('Jogada: ' + this.jogadas)
             }
         },
-        click(id) {
+        modeVersus(id) {
+            if (this.vezJogar == 1) {
+                let verif = this.clickX(id)
+                if (verif) {
+                    this.checkX()
+                    this.jogadas++
+                    if (this.jogadas == 9 && this.status == 'null') {
+                        this.draw()
+                        console.log('Jogada: ' + this.jogadas)
+                        return
+                    }
+                    this.mensagem = 'Vez do O'
+                    this.vezJogar = 2
+                }
+            } else if (this.vezJogar == 2) {
+                let verif = this.clickO(id)
+                if (verif) {
+                    this.checkO()
+                    this.jogadas++
+                    if (this.jogadas == 9 && this.status == 'null') {
+                        this.draw()
+                        console.log('Jogada: ' + this.jogadas)
+                        return
+                    }
+                    this.mensagem = 'Vez do X'
+                    this.vezJogar = 1
+                }
+            }
+        },
+        clickX(id) {
             //  Define o campo que deve ser selecionado pelo id
             switch (id) {
                 case 1:
@@ -244,6 +280,69 @@ export default {
             }
             return false
         },
+        clickO(id) {
+            //  Define o campo que deve ser selecionado pelo id
+            switch (id) {
+                case 1:
+                    if (this.campos.a1.value == 0) {
+                        this.campos.a1.value = 2;
+                        return true
+                    } 
+                    break;
+                case 2:
+                    if (this.campos.a2.value == 0) {
+                        this.campos.a2.value = 2;
+                        return true
+                    } 
+                    break;
+                case 3:
+                    if (this.campos.a3.value == 0) {
+                        this.campos.a3.value = 2;
+                        return true
+                    } 
+                    break;
+                case 4:
+                    if (this.campos.b1.value == 0) {
+                        this.campos.b1.value = 2;
+                        return true
+                    }
+                    break;
+                case 5:
+                    if (this.campos.b2.value == 0) {
+                        this.campos.b2.value = 2
+                        return true
+                    } 
+                    break;
+                case 6:
+                    if (this.campos.b3.value == 0) {
+                        this.campos.b3.value = 2
+                        return true
+                    } 
+                    break;
+                case 7:
+                    if (this.campos.c1.value == 0) {
+                        this.campos.c1.value = 2
+                        return true
+                    }
+                    break;
+                case 8:
+                    if (this.campos.c2.value == 0) {
+                        this.campos.c2.value = 2
+                        return true
+                    }
+                    break;
+                case 9:
+                    if (this.campos.c3.value == 0) {
+                        this.campos.c3.value = 2
+                        return true
+                    }
+                    break;
+                default:
+                    console.error("Erro no switch.");
+                    break;
+            }
+            return false
+        },
         checkO() {
             if (this.campos.a1.value == 2) {
                 if (this.campos.a2.value == 2 && this.campos.a3.value == 2) {
@@ -253,7 +352,7 @@ export default {
                     document.querySelectorAll('.a1, .a2, .a3').forEach(elemento => {
                         elemento.style.backgroundColor = '#ec4e4e';
                     })
-                    this.defeat()     
+                    this.victoryO()     
                 } 
                 if (this.campos.b1.value == 2 && this.campos.c1.value == 2) {
                 //| O
@@ -262,7 +361,7 @@ export default {
                     document.querySelectorAll('.a1, .b1, .c1').forEach(elemento => {
                         elemento.style.backgroundColor = '#ec4e4e';
                     })
-                    this.defeat()   
+                    this.victoryO()   
                 } 
                 if (this.campos.b2.value == 2 && this.campos.c3.value == 2) {
                 //| O
@@ -271,7 +370,7 @@ export default {
                     document.querySelectorAll('.a1, .b2, .c3').forEach(elemento => {
                         elemento.style.backgroundColor = '#ec4e4e';
                     })
-                    this.defeat()   
+                    this.victoryO()   
                 }
             } 
             if (this.campos.a2.value == 2 && this.campos.b2.value == 2 && this.campos.c2.value == 2) {
@@ -281,7 +380,7 @@ export default {
                 document.querySelectorAll('.a2, .b2, .c2').forEach(elemento => {
                     elemento.style.backgroundColor = '#ec4e4e';
                 })
-                this.defeat()
+                this.victoryO()
             }
             if (this.campos.a3.value == 2) {
                 if (this.campos.b3.value == 2 && this.campos.c3.value == 2) {
@@ -291,7 +390,7 @@ export default {
                     document.querySelectorAll('.a3, .b3, .c3').forEach(elemento => {
                         elemento.style.backgroundColor = '#ec4e4e';
                     })
-                    this.defeat()
+                    this.victoryO()
                 } 
                 if (this.campos.b2.value == 2 && this.campos.c1.value == 2) {
                 //|     O
@@ -300,7 +399,7 @@ export default {
                     document.querySelectorAll('.a3, .b2, .c1').forEach(elemento => {
                         elemento.style.backgroundColor = '#ec4e4e';
                     })
-                    this.defeat()
+                    this.victoryO()
                 }
             } 
             if (this.campos.b1.value == 2 && this.campos.b2.value == 2 && this.campos.b3.value == 2) {
@@ -310,7 +409,7 @@ export default {
                 document.querySelectorAll('.b1, .b2, .b3').forEach(elemento => {
                     elemento.style.backgroundColor = '#ec4e4e';
                 })
-                this.defeat()
+                this.victoryO()
             } 
             if (this.campos.c1.value == 2 && this.campos.c2.value == 2 && this.campos.c3.value == 2) {
             //|
@@ -319,7 +418,7 @@ export default {
                 document.querySelectorAll('.c1, .c2, .c3').forEach(elemento => {
                     elemento.style.backgroundColor = '#ec4e4e';
                 })
-                this.defeat()
+                this.victoryO()
             }
         },
         checkX() {
@@ -331,7 +430,7 @@ export default {
                     document.querySelectorAll('.a1, .a2, .a3').forEach(elemento => {
                         elemento.style.backgroundColor = '#61e261';
                     })
-                    this.victory()          
+                    this.victoryX()          
                 } 
                 if (this.campos.b1.value == 1 && this.campos.c1.value == 1) {
                 //| X
@@ -340,7 +439,7 @@ export default {
                     document.querySelectorAll('.a1, .b1, .c1').forEach(elemento => {
                         elemento.style.backgroundColor = '#61e261';
                     })
-                    this.victory()
+                    this.victoryX()
                 } 
                 if (this.campos.b2.value == 1 && this.campos.c3.value == 1) {
                 //| X
@@ -349,7 +448,7 @@ export default {
                     document.querySelectorAll('.a1, .b2, .c3').forEach(elemento => {
                         elemento.style.backgroundColor = '#61e261';
                     })
-                    this.victory()
+                    this.victoryX()
                 }
             } 
             if (this.campos.a2.value == 1 && this.campos.b2.value == 1 && this.campos.c2.value == 1) {
@@ -359,7 +458,7 @@ export default {
                 document.querySelectorAll('.a2, .b2, .c2').forEach(elemento => {
                     elemento.style.backgroundColor = '#61e261';
                 })
-                this.victory()
+                this.victoryX()
             }
             if (this.campos.a3.value == 1) {
                 if (this.campos.b3.value == 1 && this.campos.c3.value == 1) {
@@ -369,7 +468,7 @@ export default {
                     document.querySelectorAll('.a3, .b3, .c3').forEach(elemento => {
                         elemento.style.backgroundColor = '#61e261';
                     })
-                    this.victory()
+                    this.victoryX()
                 } 
                 if (this.campos.b2.value == 1 && this.campos.c1.value == 1) {
                 //|     X
@@ -378,7 +477,7 @@ export default {
                     document.querySelectorAll('.a3, .b2, .c1').forEach(elemento => {
                         elemento.style.backgroundColor = '#61e261';
                     })
-                    this.victory()
+                    this.victoryX()
                 }
             } 
             if (this.campos.b1.value == 1 && this.campos.b2.value == 1 && this.campos.b3.value == 1) {
@@ -388,7 +487,7 @@ export default {
                 document.querySelectorAll('.b1, .b2, .b3').forEach(elemento => {
                     elemento.style.backgroundColor = '#61e261';
                 })
-                this.victory()
+                this.victoryX()
             } 
             if (this.campos.c1.value == 1 && this.campos.c2.value == 1 && this.campos.c3.value == 1) {
             //|
@@ -397,29 +496,43 @@ export default {
                 document.querySelectorAll('.c1, .c2, .c3').forEach(elemento => {
                     elemento.style.backgroundColor = '#61e261';
                 })
-                this.victory()
+                this.victoryX()
             }
         },
-        victory(){
-            this.resetar = true
-            this.mensagem = "Você ganhou"
-            this.status = "win"
+        victoryX(){
+            this.reset = true
+            if (this.mode == 'bot') {
+                this.mensagem = "Você ganhou"
+                this.status = "win"
+            } else {
+                this.mensagem = "Vitória do X";
+                this.status = "X"
+            }
             console.log(this.mensagem)
-            this.vitorias++
+            this.vitoriasX++
         },
         draw(){
-            this.resetar = true
+            this.reset = true
             this.mensagem = "Empate"
             this.status = "draw"
             console.log(this.mensagem)
             this.empates++
         },
-        defeat(){
-            this.resetar = true;
-            this.mensagem = "Você perdeu";
-            this.status = "lose"
+        victoryO(){
+            this.reset = true;
+            if (this.mode == 'bot') {
+                this.mensagem = "Você perdeu";
+                this.status = "lose"
+            } else {
+                this.mensagem = "Vitória do O";
+                this.status = "O"
+            }
             console.log(this.mensagem)
-            this.derrotas++
+            this.vitoriasO++
+        },
+        randomVezJogar() {
+            var vez = Math.floor(Math.random() * (3 - 1) + 1)
+            return vez  
         },
         randomBot() {
             let repetido = false
@@ -510,15 +623,15 @@ export default {
                 return
             }
             let move = 0
-            if(this.mode == 'easy'){
+            if(this.difficulty == 'easy'){
                 //  Easy Mode
                 this.randomBot()
                 return
-            } else if (this.mode == 'medium') {
+            } else if (this.difficulty == 'medium') {
                 //  Medium Mode
                 move = defesa(this.campos)
                 console.log('Check medium ' + move)
-            } else if (this.mode == 'hard') {
+            } else if (this.difficulty == 'hard') {
                 move = ataque(this.campos)
                 console.log('Check hard ' + move)
             }
@@ -629,9 +742,18 @@ export default {
             this.campos.c2.value = 0
             this.campos.c3.value = 0
             this.jogadas = 0
-            this.resetar = false
+            this.reset = false
             this.status = 'null'
-            this.mensagem = "Você é o X"
+            if (this.mode == 'bot') {
+                this.mensagem = "Você é o X"
+            } else {
+                this.vezJogar = this.randomVezJogar()
+                if (this.vezJogar == 1) {
+                    this.mensagem = 'É a vez do X'
+                } else {
+                    this.mensagem = 'É a vez do O'
+                }
+            }
             document.querySelectorAll('.a1, .a2, .a3, .b1, .b2, .b3, .c1, .c2, .c3').forEach(elemento => {
                 elemento.style.backgroundColor = '#ebeeff';
             })
@@ -695,24 +817,23 @@ export default {
     height: 70%;
     width: auto;
 }
-#infos {
+#section-2 {
     display: grid;
     grid-template-columns: 1fr 1fr;
     grid-template-rows: auto auto;
     grid-template-areas: 
         "resultado resultado"
-        "dificuldades contadores";
-    gap: 5%;
+        "infos contadores";
+    gap: 5% 2%;
     max-width: 500px;
     width: 80%;
 
     margin: 10px auto 0 auto;
 }
-#infos > div {
+#section-2 > div {
     background-color: #ebeeff;
     border-radius: 5px;
 }
-
 #resultado {
     grid-area: resultado;
     display: flex;
@@ -733,14 +854,18 @@ export default {
     text-decoration: underline;
     cursor: pointer;
 }
-#dificuldades {
-    grid-area: dificuldades;
+#infos {
+    grid-area: infos;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
     text-align: center;
     font-weight: 400;
     color: black;
     padding: 0.2rem 0.5rem;
 }
-#dificuldades > p {
+#infos > p {
     margin: 0;
 }
 #contadores {
