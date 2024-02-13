@@ -3,7 +3,7 @@
 ## Project setup
 ```
 npm install
-```
+`jogodavelhavuejs.vercel.app
 
 ### Compiles and hot-reloads for development
 ```

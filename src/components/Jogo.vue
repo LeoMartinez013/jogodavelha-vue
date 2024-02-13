@@ -130,6 +130,44 @@ export default {
                     id: 9,
                     value: 0,
                 },
+            },
+            steps: {
+                step1: {
+                    campo: 0,
+                    value: 0
+                },
+                step2: {
+                    campo: 0,
+                    value: 0
+                },
+                step3: {
+                    campo: 0,
+                    value: 0
+                },
+                step4: {
+                    campo: 0,
+                    value: 0
+                },
+                step5: {
+                    campo: 0,
+                    value: 0
+                },
+                step6: {
+                    campo: 0,
+                    value: 0
+                },
+                step7: {
+                    campo: 0,
+                    value: 0
+                },
+                step8: {
+                    campo: 0,
+                    value: 0
+                },
+                step9: {
+                    campo: 0,
+                    value: 0
+                },
             }
         }
     },
@@ -157,7 +195,10 @@ export default {
                     } else {
                         this.mensagem = 'Vez do O'
                     }
+                } else {
+                    this.vezJogar = 1
                 }
+                
             }
         },
         mainGame(id) {
@@ -181,12 +222,16 @@ export default {
                     console.log('Jogada: ' + this.jogadas)
                     return
                 } else if (!this.reset) {
-                    this.robo()
+                    this.vezJogar = 2
+                    this.botLogic()
                     this.checkO()
                 }
                 
                 console.log('Jogada: ' + this.jogadas)
             }
+        },
+        registerSteps(id) {
+            
         },
         modeVersus(id) {
             if (this.vezJogar == 1) {
@@ -536,88 +581,21 @@ export default {
         },
         randomBot() {
             let repetido = false
+            const chaves = Object.keys(this.campos)
             do {
                 var idBot = Math.floor(Math.random() * (10 - 1) + 1);
-                var cont = 1
-                console.log('Check Random: ' + cont)
-                switch (idBot) {
-                    case 1:
-                        if(this.campos.a1.value == 0) {
-                            repetido = false
-                            this.botA1()
-                        } else {
-                            repetido = true
-                        }
-                        break;
-                    case 2:
-                        if(this.campos.a2.value == 0) {
-                            repetido = false
-                            this.botA2()
-                        } else {
-                            repetido = true
-                        }
-                        break;
-                    case 3:
-                        if(this.campos.a3.value == 0) {
-                            repetido = false
-                            this.botA3()
-                        } else {
-                            repetido = true
-                        }
-                        break;
-                    case 4:
-                        if(this.campos.b1.value == 0) {
-                            repetido = false
-                            this.botB1()
-                        } else {
-                            repetido = true
-                        }
-                        break;
-                    case 5:
-                        if(this.campos.b2.value == 0) {
-                            repetido = false
-                            this.botB2()
-                        } else {
-                            repetido = true
-                        }
-                        break;
-                    case 6:
-                        if(this.campos.b3.value == 0) {
-                            repetido = false
-                            this.botB3()
-                        } else {
-                            repetido = true
-                        }
-                        break;
-                    case 7:
-                        if(this.campos.c1.value == 0) {
-                            repetido = false
-                            this.botC1()
-                        } else {
-                            repetido = true
-                        }
-                        break;
-                    case 8:
-                        if(this.campos.c2.value == 0) {
-                            repetido = false
-                            this.botC2()
-                        } else {
-                            repetido = true
-                        }
-                        break;
-                    case 9:
-                        if(this.campos.c3.value == 0) {
-                            repetido = false
-                            this.botC3()
-                        } else {
-                            repetido = true
-                        }
-                        break;
+                var auxIdBot = idBot - 1
+                var chaveBot = chaves[auxIdBot]
+                console.log('ChaveBot: ' + chaveBot + ' /auxIdBot: ' + auxIdBot + ' /idBot: ' + idBot)
+                if (this.campos[chaveBot].value == 0){
+                    this.botMove(idBot)
+                    repetido = false
+                } else {
+                    repetido = true
                 }
             } while (repetido)
         },
-        robo() {
-            
+        botLogic() {
             if (this.jogadas == 0) {
                 this.randomBot()
                 return
@@ -635,102 +613,78 @@ export default {
                 move = ataque(this.campos)
                 console.log('Check hard ' + move)
             }
+            this.botMove(move)
+        },
+        botMove(move) {
             switch (move) {
                 case 1:
                     if(this.campos.a1.value == 0) {
-                        this.botA1()
+                        this.campos.a1.value = 2
+                        this.jogadas++
+                        console.log('Bot: A1')
                     }
                     break;
                 case 2:
                     if(this.campos.a2.value == 0) {
-                        this.botA2()
+                        this.campos.a2.value = 2
+                        this.jogadas++
+                        console.log('Bot: A2')
                     }
                     break;
                 case 3:
                     if(this.campos.a3.value == 0) {
-                        this.botA3()
+                        this.campos.a3.value = 2
+                        this.jogadas++
+                        console.log('Bot: A3')
                     }
                     break;
                 case 4:
                     if(this.campos.b1.value == 0) {
-                        this.botB1()
+                        this.campos.b1.value = 2
+                        this.jogadas++
+                        console.log('Bot: B1')
                     }
                     break;
                 case 5:
                     if(this.campos.b2.value == 0) {
-                        this.botB2()
+                        this.campos.b2.value = 2
+                        this.jogadas++
+                        console.log('Bot: B2')
                     }
                     break;
                 case 6:
                     if(this.campos.b3.value == 0) {
-                        this.botB3()
+                        this.campos.b3.value = 2
+                        this.jogadas++
+                        console.log('Bot: B3')
                     }
                     break;
                 case 7:
                     if(this.campos.c1.value == 0) {
-                        this.botC1()
+                        this.campos.c1.value = 2
+                        this.jogadas++
+                        console.log('Bot: C1')
                     }
                     break;
                 case 8:
                     if(this.campos.c2.value == 0) {
-                        this.botC2()
+                        this.campos.c2.value = 2
+                        this.jogadas++
+                        console.log('Bot: C2')
                     }
                     break;
                 case 9:
                     if(this.campos.c3.value == 0) {
-                        this.botC3()
+                        this.campos.c3.value = 2
+                        this.jogadas++
+                        console.log('Bot: C3')
                     }
                     break;
                 default:
                     this.randomBot()
                     break;
             }
-        },
-        botA1() {
-            this.campos.a1.value = 2
-            this.jogadas++
-            console.log('Bot: A1')
-        },
-        botA2() {
-            this.campos.a2.value = 2
-            this.jogadas++
-            console.log('Bot: A2')
-        },
-        botA3() {
-            this.campos.a3.value = 2
-            this.jogadas++
-            console.log('Bot: A3')
-        },
-        botB1() {
-            this.campos.b1.value = 2
-            this.jogadas++
-            console.log('Bot: B1')
-        },
-        botB2() {
-            this.campos.b2.value = 2
-            this.jogadas++
-            console.log('Bot: B2')
-        },
-        botB3() {
-            this.campos.b3.value = 2
-            this.jogadas++
-            console.log('Bot: B3')
-        },
-        botC1() {
-            this.campos.c1.value = 2
-            this.jogadas++
-            console.log('Bot: C1')
-        },
-        botC2() {
-            this.campos.c2.value = 2
-            this.jogadas++
-            console.log('Bot: C2')
-        },
-        botC3() {
-            this.campos.c3.value = 2
-            this.jogadas++
-            console.log('Bot: C3')
-        },       
+        },   
         reiniciar() {
             this.campos.a1.value = 0
             this.campos.a2.value = 0
@@ -757,6 +711,7 @@ export default {
             document.querySelectorAll('.a1, .a2, .a3, .b1, .b2, .b3, .c1, .c2, .c3').forEach(elemento => {
                 elemento.style.backgroundColor = '#ebeeff';
             })
+            this.vezJogar = 1
             console.clear()
         },
     },
