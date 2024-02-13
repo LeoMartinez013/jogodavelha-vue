@@ -214,24 +214,43 @@ export default {
         },
         modeBot(id) {
             let verif = this.clickX(id)
+            
             if (verif) {
+                this.registerSteps(id)
                 this.checkX()
                 this.jogadas++
+                console.log('Jogada: ' + this.jogadas)
                 if (this.jogadas == 9 && this.status == 'null') {
                     this.draw()
                     console.log('Jogada: ' + this.jogadas)
                     return
                 } else if (!this.reset) {
                     this.vezJogar = 2
-                    this.botLogic()
+                    id = this.botLogic()
+                    this.registerSteps(id)
                     this.checkO()
+                    this.jogadas++
+                    console.log('Jogada: ' + this.jogadas)
+                    this.vezJogar = 1
                 }
                 
-                console.log('Jogada: ' + this.jogadas)
+                
             }
         },
         registerSteps(id) {
+            const chaves = Object.keys(this.steps)
             
+            var chaveStep = chaves[this.jogadas]
+            this.steps[chaveStep].value = this.vezJogar
+            this.steps[chaveStep].campo = id
+        },
+        showSteps() {
+            console.log('Exibindo steps: ')
+            for (let step in this.steps){
+                if (this.steps[step].value != 0){
+                    console.log(this.steps[step].value + ' > ' + this.steps[step].campo)
+                }
+            }   
         },
         modeVersus(id) {
             if (this.vezJogar == 1) {
@@ -555,6 +574,7 @@ export default {
             }
             console.log(this.mensagem)
             this.vitoriasX++
+            this.showSteps()
         },
         draw(){
             this.reset = true
@@ -562,6 +582,7 @@ export default {
             this.status = "draw"
             console.log(this.mensagem)
             this.empates++
+            this.showSteps()
         },
         victoryO(){
             this.reset = true;
@@ -574,26 +595,24 @@ export default {
             }
             console.log(this.mensagem)
             this.vitoriasO++
+            this.showSteps()
         },
         randomVezJogar() {
             var vez = Math.floor(Math.random() * (3 - 1) + 1)
             return vez  
         },
         randomBot() {
-            let repetido = false
+            let repetido = true
             const chaves = Object.keys(this.campos)
             do {
                 var idBot = Math.floor(Math.random() * (10 - 1) + 1);
                 var auxIdBot = idBot - 1
                 var chaveBot = chaves[auxIdBot]
-                console.log('ChaveBot: ' + chaveBot + ' /auxIdBot: ' + auxIdBot + ' /idBot: ' + idBot)
                 if (this.campos[chaveBot].value == 0){
-                    this.botMove(idBot)
-                    repetido = false
-                } else {
-                    repetido = true
+                    return this.botMove(idBot)
                 }
             } while (repetido)
+
         },
         botLogic() {
             if (this.jogadas == 0) {
@@ -603,87 +622,77 @@ export default {
             let move = 0
             if(this.difficulty == 'easy'){
                 //  Easy Mode
-                this.randomBot()
-                return
+                return this.randomBot()
             } else if (this.difficulty == 'medium') {
                 //  Medium Mode
-                move = defesa(this.campos)
+                move = ataque(this.campos)
                 console.log('Check medium ' + move)
             } else if (this.difficulty == 'hard') {
                 move = ataque(this.campos)
                 console.log('Check hard ' + move)
             }
-            this.botMove(move)
+            return this.botMove(move)
         },
         botMove(move) {
             switch (move) {
                 case 1:
                     if(this.campos.a1.value == 0) {
                         this.campos.a1.value = 2
-                        this.jogadas++
                         console.log('Bot: A1')
                     }
                     break;
                 case 2:
                     if(this.campos.a2.value == 0) {
                         this.campos.a2.value = 2
-                        this.jogadas++
                         console.log('Bot: A2')
                     }
                     break;
                 case 3:
                     if(this.campos.a3.value == 0) {
                         this.campos.a3.value = 2
-                        this.jogadas++
                         console.log('Bot: A3')
                     }
                     break;
                 case 4:
                     if(this.campos.b1.value == 0) {
                         this.campos.b1.value = 2
-                        this.jogadas++
                         console.log('Bot: B1')
                     }
                     break;
                 case 5:
                     if(this.campos.b2.value == 0) {
                         this.campos.b2.value = 2
-                        this.jogadas++
                         console.log('Bot: B2')
                     }
                     break;
                 case 6:
                     if(this.campos.b3.value == 0) {
                         this.campos.b3.value = 2
-                        this.jogadas++
                         console.log('Bot: B3')
                     }
                     break;
                 case 7:
                     if(this.campos.c1.value == 0) {
                         this.campos.c1.value = 2
-                        this.jogadas++
                         console.log('Bot: C1')
                     }
                     break;
                 case 8:
                     if(this.campos.c2.value == 0) {
                         this.campos.c2.value = 2
-                        this.jogadas++
                         console.log('Bot: C2')
                     }
                     break;
                 case 9:
                     if(this.campos.c3.value == 0) {
                         this.campos.c3.value = 2
-                        this.jogadas++
                         console.log('Bot: C3')
                     }
                     break;
                 default:
-                    this.randomBot()
-                    break;
+                    return this.randomBot()
             }
+            return move
         },   
         reiniciar() {
             this.campos.a1.value = 0
@@ -700,6 +709,10 @@ export default {
             this.status = 'null'
             if (this.mode == 'bot') {
                 this.mensagem = "Você é o X"
+                for (let step in this.steps) {
+                    this.steps[step].campo = 0
+                    this.steps[step].value = 0
+                }
             } else {
                 this.vezJogar = this.randomVezJogar()
                 if (this.vezJogar == 1) {
